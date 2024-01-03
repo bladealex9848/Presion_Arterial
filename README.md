@@ -1,4 +1,4 @@
-![Logo del detector de PartoSeguro Monitor](https://github.com/bladealex9848/PartoSeguroApp/blob/main/img/logo.png?raw=true)
+![Logo de Monitoreo de Presión Arterial](https://raw.githubusercontent.com/bladealex9848/Presion_Arterial/main/img/logo.png)
 
 # Monitoreo de Presión Arterial
 
