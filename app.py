@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 from PIL import Image
 import pandas as pd
@@ -33,8 +34,24 @@ Esta aplicación permite el seguimiento continuo y detallado de la presión arte
 registrando y visualizando datos clave como la presión sistólica y diastólica.
 """)
 
-# Conexión con la base de datos SQLite.
-conn = sqlite3.connect('presion_arterial.db')
+# Función para conectar a la base de datos y manejar errores.
+def conectar_bd(ruta_bd):
+    try:
+        conn = sqlite3.connect(ruta_bd)
+        return conn
+    except sqlite3.DatabaseError as e:
+        st.error(f"Error de base de datos detectado: {e}. Intentando reparar...")
+        try:
+            os.remove(ruta_bd)  # Elimina el archivo corrupto
+            return sqlite3.connect(ruta_bd)  # Crea una nueva base de datos
+        except Exception as e:
+            st.error(f"No se pudo reparar la base de datos: {e}")
+            return None
+
+conn = conectar_bd('presion_arterial.db')
+if conn is None:
+    st.stop()
+
 c = conn.cursor()
 
 # Creación de las tablas en la base de datos si no existen.
@@ -154,10 +171,15 @@ for id_paciente, nombre in pacientes:
         st.markdown(f"<div class='paciente-container'>", unsafe_allow_html=True)
         st.markdown(f"<h2 class='paciente-header'>Paciente: {nombre} (ID: {id_paciente})</h2>", unsafe_allow_html=True)
         
-        # Obtener y mostrar la historia clínica del paciente
-        c.execute("SELECT historial FROM pacientes WHERE id = ?", (id_paciente,))
-        historial_paciente = c.fetchone()[0]
-        st.text("Historia Clínica: " + historial_paciente)
+        # Obtener y mostrar la historia clínica del paciente        
+        try:
+            c.execute("SELECT historial FROM pacientes WHERE id = ?", (id_paciente,))
+            historial_paciente = c.fetchone()[0]
+            with st.expander("Ver Historia Clínica"):
+                st.markdown(f"**Historia Clínica:**\n{historial_paciente}")
+        except sqlite3.DatabaseError as e:
+            st.error(f"Error al obtener la historia clínica: {e}")
+            continue
         
         try:
             mediciones_df = pd.read_sql_query("SELECT * FROM mediciones WHERE id_paciente = ? ORDER BY fecha", conn, params=(id_paciente,))
