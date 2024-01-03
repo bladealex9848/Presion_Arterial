@@ -154,6 +154,11 @@ for id_paciente, nombre in pacientes:
         st.markdown(f"<div class='paciente-container'>", unsafe_allow_html=True)
         st.markdown(f"<h2 class='paciente-header'>Paciente: {nombre} (ID: {id_paciente})</h2>", unsafe_allow_html=True)
         
+        # Obtener y mostrar la historia clínica del paciente
+        c.execute("SELECT historial FROM pacientes WHERE id = ?", (id_paciente,))
+        historial_paciente = c.fetchone()[0]
+        st.text("Historia Clínica: " + historial_paciente)
+        
         try:
             mediciones_df = pd.read_sql_query("SELECT * FROM mediciones WHERE id_paciente = ? ORDER BY fecha", conn, params=(id_paciente,))
         except Exception as e:

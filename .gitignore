@@ -24,8 +24,8 @@ var/
 *.egg
 
 # SQLite database files
-#*.db
-#*.sqlite
+*.db
+*.sqlite
 
 # Streamlit app configuration
 .streamlit/
