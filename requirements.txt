@@ -2,4 +2,3 @@ streamlit
 pandas
 pytz
 matplotlib
-sqlite3
